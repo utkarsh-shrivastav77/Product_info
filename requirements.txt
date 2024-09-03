@@ -1,4 +1,3 @@
 anthropic
-os
 python-dotenv
 flask
