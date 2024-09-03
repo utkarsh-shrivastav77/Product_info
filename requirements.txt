@@ -2,3 +2,4 @@ streamlite
 anthropic
 os
 python-dotenv
+flask

@@ -1,7 +1,9 @@
-import streamlit as st
+from flask import Flask, request, jsonify
 import anthropic
 import os
 from dotenv import load_dotenv
+
+app = Flask(__name__)
 
 # Load environment variables
 load_dotenv()
@@ -37,21 +39,22 @@ Please provide:
 Format the response with clear headings for Summary, Pros, and Cons. Use bullet points for pros and cons."""
     return get_claude_response(prompt)
 
-st.title("Product Summary, Pros and Cons Generator")
+@app.route('/generate', methods=['POST'])
+def generate():
+    data = request.json
+    product_name = data.get('product_name')
+    product_info = data.get('product_info')
 
-product_name = st.text_input("Enter the name of the product:")
-product_info = st.text_area("Enter additional information about the product:", height=100)
+    if not product_name or not product_info:
+        return jsonify({"error": "Please provide both product name and product information."}), 400
 
-if st.button("Generate Summary, Pros and Cons"):
-    if product_name and product_info:
-        with st.spinner("Generating summary, pros and cons..."):
-            result = generate_summary_pros_cons(product_name, product_info)
-            st.markdown(result)
-    else:
-        st.warning("Please enter both the product name and information.")
+    result = generate_summary_pros_cons(product_name, product_info)
+    return jsonify({"result": result})
 
-st.sidebar.header("About")
-st.sidebar.info(
-    "This app uses Claude AI to generate a summary, pros, and cons for a given product. "
-    "Enter a product name and additional information, then click the button to get a comprehensive overview."
-)
+@app.route('/status', methods=['GET'])
+def status():
+    return jsonify({"status": "API is running"})
+
+if __name__ == "__main__":
+    app.run(host='0.0.0.0', port=4444)
+
