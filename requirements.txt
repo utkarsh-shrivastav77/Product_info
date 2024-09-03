@@ -1,4 +1,4 @@
 streamlite
 anthropic
 os
-dotenv
+python-dotenv
